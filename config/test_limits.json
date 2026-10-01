@@ -1,0 +1,5 @@
+{
+  "voltage": {"min": 3.0, "max": 3.6, "stuck_samples": 5},
+  "temperature": {"max": 85.0, "max_rise_rate": 2.0},
+  "sampling": {"expected_interval_seconds": 1.0, "max_gap_seconds": 2.5}
+}

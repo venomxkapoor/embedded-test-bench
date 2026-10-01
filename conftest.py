@@ -1,1 +1,3 @@
-# Empty on purpose: its presence lets pytest find the hil_analyzer package from the project root.
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent))

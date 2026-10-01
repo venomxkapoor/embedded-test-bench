@@ -1,41 +1,53 @@
-"""Create a synthetic test log with known problems injected, so the analyzer has something to find.
-
-Usage:  python scripts/generate_sample_log.py logs/sample_log.csv
-        python scripts/generate_sample_log.py logs/healthy_log.csv --healthy
-"""
+"""Deterministic synthetic telemetry for repeatable tests; no serial hardware."""
 import argparse
-
+from pathlib import Path
 import numpy as np
 import pandas as pd
 
-
-def make_log(healthy=False, seed=42, n=120):
-    rng = np.random.default_rng(seed)  # fixed seed -> same file every time (reproducible)
-    t = np.arange(n, dtype=float)                       # 1 sample per second
-    voltage = 3.30 + rng.normal(0, 0.02, n)             # nominal 3.3 V plus noise
-    temperature = 25.0 + 0.02 * t + rng.normal(0, 0.05, n)
-
-    if not healthy:
-        voltage[40:43] = 3.75                            # over-voltage spike
-        voltage[70:77] = 3.300                           # stuck sensor: 7 identical values
-        temperature[100:110] = temperature[100] + 3.0 * np.arange(10)  # fast temperature rise
-
-    df = pd.DataFrame({"timestamp": t, "voltage": voltage.round(3),
-                       "temperature": temperature.round(2)})
-
-    # Make it messy like a real log: junk strings, gaps, one duplicated row
-    df = df.astype({"voltage": object, "temperature": object})
-    df.loc[15, "voltage"] = "NOISE"
-    df.loc[16, "temperature"] = "ERR"
-    df.loc[25, "voltage"] = None
-    df = pd.concat([df, df.iloc[[30]]], ignore_index=True)
-    return df
+SCENARIOS = ('healthy', 'over_voltage', 'under_voltage', 'stuck_sensor',
+             'over_temperature', 'rapid_temperature_rise', 'sampling_gap', 'malformed', 'faulty')
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("out")
-    parser.add_argument("--healthy", action="store_true", help="no injected faults")
+def make_log(scenario='healthy', seed=7):
+    if scenario not in SCENARIOS:
+        raise ValueError(f'Unknown scenario: {scenario}')
+    rng = np.random.default_rng(seed)
+    timestamp = np.arange(120, dtype=float)
+    voltage = np.round(3.30 + rng.normal(0, .008, 120), 3)
+    temperature = np.round(25 + .04 * timestamp + rng.normal(0, .02, 120), 2)
+    df = pd.DataFrame({'timestamp': timestamp, 'voltage': voltage, 'temperature': temperature})
+    if scenario in ('over_voltage', 'faulty'):
+        df.loc[15:17, 'voltage'] = [3.72, 3.75, 3.74]
+    if scenario in ('under_voltage', 'faulty'):
+        df.loc[25:26, 'voltage'] = [2.95, 2.97]
+    if scenario in ('stuck_sensor', 'faulty'):
+        df.loc[35:41, 'voltage'] = 3.31
+    if scenario in ('over_temperature', 'faulty'):
+        # Offset a whole segment; the edge also legitimately triggers a rise fault.
+        df.loc[65:69, 'temperature'] = [86, 86.2, 86.4, 86.6, 86.8]
+    if scenario in ('rapid_temperature_rise', 'faulty'):
+        df.loc[80:85, 'temperature'] = [30, 34, 38, 42, 46, 50]
+    if scenario in ('sampling_gap', 'faulty'):
+        df = df.drop(index=range(100, 105))
+    if scenario == 'malformed':
+        df['voltage'] = df.voltage.astype(object)
+        df.loc[10, 'voltage'] = 'ERR'
+    return df.reset_index(drop=True)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--scenario', choices=SCENARIOS)
+    parser.add_argument('--out', type=Path)
     args = parser.parse_args()
-    make_log(healthy=args.healthy).to_csv(args.out, index=False)
-    print(f"wrote {args.out}")
+    if bool(args.scenario) != bool(args.out):
+        parser.error('--scenario and --out must be used together')
+    targets = [(args.scenario, args.out)] if args.scenario else [('healthy', Path('logs/healthy_log.csv')), ('faulty', Path('logs/faulty_log.csv'))]
+    for scenario, target in targets:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        make_log(scenario).to_csv(target, index=False)
+        print(target)
+
+
+if __name__ == '__main__':
+    main()

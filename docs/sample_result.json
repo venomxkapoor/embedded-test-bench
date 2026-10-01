@@ -1,0 +1,36 @@
+{
+  "samples": 115,
+  "raw_samples": 115,
+  "verdict": "FAIL",
+  "faults": {
+    "over_voltage": 3,
+    "under_voltage": 2,
+    "stuck_sensor": 7,
+    "over_temperature": 5,
+    "rapid_temperature_rise": 7,
+    "sampling_gap": 1
+  },
+  "quality_issues": {
+    "invalid_timestamp": 0,
+    "invalid_voltage": 0,
+    "invalid_temperature": 0,
+    "duplicate_timestamp": 0,
+    "unsorted_timestamp": 0
+  },
+  "quality_issue_samples": 0,
+  "limits": {
+    "voltage": {
+      "min": 3.0,
+      "max": 3.6,
+      "stuck_samples": 5
+    },
+    "temperature": {
+      "max": 85.0,
+      "max_rise_rate": 2.0
+    },
+    "sampling": {
+      "expected_interval_seconds": 1.0,
+      "max_gap_seconds": 2.5
+    }
+  }
+}

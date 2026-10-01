@@ -1,19 +1,102 @@
 {
   "version": 1,
-  "author": "your-name-here",
+  "author": "Ankit Kapoor",
   "editor": "wokwi",
   "parts": [
-    { "type": "wokwi-arduino-uno", "id": "uno", "top": 0, "left": 0, "attrs": {} },
-    { "type": "wokwi-potentiometer", "id": "pot_voltage", "top": -110, "left": 200, "attrs": {} },
-    { "type": "wokwi-potentiometer", "id": "pot_temp", "top": -110, "left": 320, "attrs": {} }
+    {
+      "type": "wokwi-arduino-uno",
+      "id": "uno",
+      "top": 100,
+      "left": 30,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-potentiometer",
+      "id": "v",
+      "top": -60,
+      "left": 20,
+      "attrs": {
+        "value": "675"
+      }
+    },
+    {
+      "type": "wokwi-potentiometer",
+      "id": "t",
+      "top": -60,
+      "left": 210,
+      "attrs": {
+        "value": "256"
+      }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "lv",
+      "top": -105,
+      "left": 5,
+      "attrs": {
+        "text": "Voltage 0-5 V"
+      }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "lt",
+      "top": -105,
+      "left": 190,
+      "attrs": {
+        "text": "Temperature 0-100 C"
+      }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "note",
+      "top": 350,
+      "left": 10,
+      "attrs": {
+        "text": "SIMULATED DUT | 1 Hz CSV | 115200 baud"
+      }
+    }
   ],
   "connections": [
-    [ "pot_voltage:SIG", "uno:A0", "green", [ "v0" ] ],
-    [ "pot_voltage:VCC", "uno:5V", "red", [ "v0" ] ],
-    [ "pot_voltage:GND", "uno:GND.2", "black", [ "v0" ] ],
-    [ "pot_temp:SIG", "uno:A1", "green", [ "v0" ] ],
-    [ "pot_temp:VCC", "uno:5V", "red", [ "v0" ] ],
-    [ "pot_temp:GND", "uno:GND.2", "black", [ "v0" ] ]
+    [
+      "v:SIG",
+      "uno:A0",
+      "green",
+      []
+    ],
+    [
+      "v:VCC",
+      "uno:5V",
+      "red",
+      []
+    ],
+    [
+      "v:GND",
+      "uno:GND.2",
+      "black",
+      []
+    ],
+    [
+      "t:SIG",
+      "uno:A1",
+      "orange",
+      []
+    ],
+    [
+      "t:VCC",
+      "uno:5V",
+      "red",
+      []
+    ],
+    [
+      "t:GND",
+      "uno:GND.2",
+      "black",
+      []
+    ]
   ],
-  "dependencies": {}
+  "serialMonitor": {
+    "display": "always",
+    "newline": "lf",
+    "convertEol": true
+  }
 }

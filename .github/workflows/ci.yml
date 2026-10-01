@@ -1,5 +1,7 @@
 name: tests
 on: [push, pull_request]
+permissions:
+  contents: read
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -7,6 +9,26 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: '3.12'
+          cache: pip
       - run: pip install -r requirements.txt
-      - run: pytest -v
+      - name: Unit and end-to-end tests
+        run: python -m pytest -q --junitxml=results/junit.xml --cov=hil_analyzer --cov=run_analysis --cov-report=term-missing --cov-report=xml:results/coverage.xml --cov-fail-under=85
+      - name: Generate sample reports and check exit statuses
+        shell: bash
+        run: |
+          python run_analysis.py logs/healthy_log.csv --out-dir results/healthy
+          set +e
+          python run_analysis.py logs/faulty_log.csv --out-dir results/faulty
+          code=$?
+          set -e
+          test "$code" -eq 1
+      - name: Build and run the container
+        run: |
+          docker build -t embedded-test-bench .
+          docker run --rm embedded-test-bench
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-evidence
+          path: results/

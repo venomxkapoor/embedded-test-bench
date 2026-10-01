@@ -42,6 +42,9 @@ def load_config(path=None):
     if path is None:
         path = Path(__file__).resolve().parent.parent / 'config' / 'test_limits.json'
     try:
-        return validate_limits(json.loads(Path(path).read_text(encoding='utf-8')))
+        data = json.loads(Path(path).read_text(encoding='utf-8'))
+        if not isinstance(data, dict):
+            raise ValueError('Invalid configuration: expected a JSON object')
+        return validate_limits(data)
     except json.JSONDecodeError as exc:
         raise ValueError(f"Invalid JSON configuration: {exc.msg}") from exc

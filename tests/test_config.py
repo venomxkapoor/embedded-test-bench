@@ -21,6 +21,9 @@ def test_rejects_bad_configuration(tmp_path):
     broken.write_text('{')
     with pytest.raises(ValueError, match='Invalid JSON'):
         load_config(broken)
+    broken.write_text('null')
+    with pytest.raises(ValueError, match='expected a JSON object'):
+        load_config(broken)
 
 
 def test_defaults_are_not_mutated():

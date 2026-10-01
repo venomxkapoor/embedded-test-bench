@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "author": "your-name-here",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-arduino-uno", "id": "uno", "top": 0, "left": 0, "attrs": {} },
+    { "type": "wokwi-potentiometer", "id": "pot_voltage", "top": -110, "left": 200, "attrs": {} },
+    { "type": "wokwi-potentiometer", "id": "pot_temp", "top": -110, "left": 320, "attrs": {} }
+  ],
+  "connections": [
+    [ "pot_voltage:SIG", "uno:A0", "green", [ "v0" ] ],
+    [ "pot_voltage:VCC", "uno:5V", "red", [ "v0" ] ],
+    [ "pot_voltage:GND", "uno:GND.2", "black", [ "v0" ] ],
+    [ "pot_temp:SIG", "uno:A1", "green", [ "v0" ] ],
+    [ "pot_temp:VCC", "uno:5V", "red", [ "v0" ] ],
+    [ "pot_temp:GND", "uno:GND.2", "black", [ "v0" ] ]
+  ],
+  "dependencies": {}
+}

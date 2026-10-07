@@ -10,9 +10,9 @@ A small test bench for a device that reports supply voltage and board temperatur
 
 ## Why this project
 
-The aim is to practise a typical test-automation task: turn measurements into a repeatable result that another person can inspect. The Python work builds on CSV/JSON handling, boolean masks, repeated-value detection and plotting exercises. A simple Arduino Uno simulation provides an embedded source of representative telemetry.
+This project demonstrates a repeatable test-automation workflow for simulated embedded telemetry: measurements are validated, analyzed against configurable limits, and converted into inspectable verdicts and evidence. A simple Arduino Uno simulation provides a representative telemetry source.
 
-The starter log analyzer was extended with configuration validation, additional checks, input-quality tracking, boundary tests, CI artifacts and a container. The scope stays small enough to explain function by function.
+The analyzer includes configuration validation, fault checks, input-quality tracking, boundary tests, CI artifacts and containerized execution.
 
 ## Architecture
 
@@ -144,8 +144,6 @@ docker run --rm -v "$PWD/results:/app/results" embedded-test-bench
 - Input repair creates a plotting view, not replacement measurements. Forward-filling can hide events, which is why imputed values cannot clear a quality failure.
 - CSV processing is offline and in memory. It does not validate electrical behaviour, serial transport, real-time latency or long-term reliability.
 
-## Learning and next changes
+## Future engineering improvements
 
-Start with the [interview guide](docs/INTERVIEW_GUIDE.md), [nine exercises](docs/STUDENT_EXERCISES.md), and [study-material map](docs/LEARNING_MAP.md). They cover numeric coercion, vectorized comparisons, time-aware derivatives, test design, reports and exit codes. Complete the exercises and explain the code before describing these as mastered skills.
-
-Useful future changes are a physical serial capture adapter, a noise-aware stuck rule, and chunked processing for large logs. CAN remains a separate project.
+Potential extensions include a physical serial capture adapter, a noise-aware stuck-sensor rule, and chunked processing for large logs. CAN remains a separate project.
